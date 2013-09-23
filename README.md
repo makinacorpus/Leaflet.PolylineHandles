@@ -28,8 +28,8 @@ Usage
 
 Additionally, events dedicated to grab markers:
 
-* **grab:on** (latlng) : fired when mouse is close to the line.
-* **grab:move** (latlng) : fired when mouse is moved.
+* **grab:on** (latlng, layer) : fired when mouse is close to the line.
+* **grab:move** (latlng, layer) : fired when mouse is moved.
 * **grab:off** : fired when mouse is far.
 
 

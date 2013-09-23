@@ -77,9 +77,11 @@ L.Handler.PolylineGrab = L.Handler.extend({
 
         if (closest) {
             if (!this._previous) {
-                this.fire('grab:on', {latlng: closest.latlng});
+                this.fire('grab:on', {layer: closest.layer,
+                                      latlng: closest.latlng});
             }
-            this.fire('grab:move', {latlng: closest.latlng});
+            this.fire('grab:move', {layer: closest.layer,
+                                    latlng: closest.latlng});
         }
         else {
             if (this._previous) {
