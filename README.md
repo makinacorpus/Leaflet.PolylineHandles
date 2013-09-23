@@ -23,6 +23,8 @@ Usage
 
 ```
 
+And add default stylesheet ``leaflet.pathgrab.css`` for grab markers.
+
 ### Events ###
 
 * **attach** (marker, layer) : fired when a grab is attached to a line.
