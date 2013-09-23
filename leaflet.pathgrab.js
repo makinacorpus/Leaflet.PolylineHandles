@@ -133,6 +133,9 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._marker = null;
     },
 
+    // When marker starts dragging :
+    //  - initialize snapping
+    //  - ignore map mouse moves
     _onDragStart: function (e) {
         this._dragging = true;
 
@@ -145,6 +148,17 @@ L.Handler.PolylineGrab = L.Handler.extend({
         marker.on('unsnap', this._onUnsnap, this);
     },
 
+    _onSnap: function (e) {
+        this._snap = e.layer;
+    },
+
+    _onUnsnap: function (e) {
+        this._snap = null;
+    },
+
+    // When marker dragging stops :
+    //  - 'attach' and start again if marker was snapped
+    //  - 'detach' if marker was previously attached
     _onDragEnd: function (e) {
         var marker = e.target;
         marker.snapediting.disable();
@@ -153,26 +167,19 @@ L.Handler.PolylineGrab = L.Handler.extend({
 
         if (this._snap) {
             this.fire('attach', {marker: marker, layer: this._snap});
+            L.DomUtil.addClass(marker._icon, 'marker-attached');
             // Start over
             this._onGrabOn({latlng: marker.getLatLng()});
         }
         else {
             if (marker !== this._marker) {
                 this.fire('detach', {marker: marker});
+                L.DomUtil.removeClass(marker._icon, 'marker-attached');
                 // Remove from map
                 this._map.removeLayer(marker);
             }
         }
-
         this._dragging = false;
-    },
-
-    _onSnap: function (e) {
-        this._snap = e.layer;
-    },
-
-    _onUnsnap: function (e) {
-        this._snap = null;
     }
 });
 
