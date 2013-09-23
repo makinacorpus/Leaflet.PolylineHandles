@@ -41,9 +41,15 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._map.on('mousemovesample', this._onMouseMove, this);
         this.on('grab:on', this._onGrabOn, this);
         this.on('grab:off', this._onGrabOff, this);
+
+        this._map.whenReady(function() {
+            this._marker.snapediting = new L.Handler.MarkerSnap(this._map);
+        }, this);
     },
 
     removeHooks: function () {
+        delete this._marker.snapediting;
+
         this.off('grab:on', this._onGrabOn, this);
         this.off('grab:off', this._onGrabOff, this);
         this._map.off('mousemovesample');
@@ -58,6 +64,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
         }
         else {
             this._layers.push(layer);
+            this._marker.snapediting.addGuideLayer(layer);
         }
     },
 
@@ -86,11 +93,6 @@ L.Handler.PolylineGrab = L.Handler.extend({
     },
 
     _onGrabOn: function (e) {
-        this._marker.snapediting = new L.Handler.MarkerSnap(this._map);
-        for (var i=0, n=this._layers.length; i<n; i++) {
-            this._marker.snapediting.addGuideLayer(this._layers[i]);
-        }
-
         this._marker.dragging = new L.Handler.MarkerDrag(this._marker);
         this._marker.dragging.enable();
         this._marker.on('dragstart', this._onDragStart, this);
@@ -100,19 +102,18 @@ L.Handler.PolylineGrab = L.Handler.extend({
     _onGrabOff: function (e) {
         this._marker.off('dragstart', this._onDragStart, this);
         this._marker.off('dragend', this._onDragEnd, this);
-        delete this._marker.snapediting;
     },
 
     _onDragStart: function (e) {
+        this._dragging = true;
         this._marker.snapediting.watchMarker(this._marker);
         this._marker.snapediting.enable();
-        this._dragging = true;
     },
 
     _onDragEnd: function (e) {
-        this._dragging = false;
         this._marker.snapediting.unwatchMarker(this._marker);
         this._marker.snapediting.disable();
+        this._dragging = false;
     }
 });
 
