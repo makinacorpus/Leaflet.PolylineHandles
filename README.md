@@ -1,11 +1,11 @@
 Leaflet.PathGrab
 ================
 
-This plugin allows to grab intermediary points on a polyline, the same way
-you choose intermediary steps on route maps.
-
-It can also be used to detect mouse hovering events on lines, with a tolerance
+This plugin allows to detect mouse hovering events on lines, with a tolerance
 distance.
+
+It can also be used to grab intermediary points on a polyline, the same way
+you choose intermediary steps on route maps.
 
 Play with [online demo](http://makinacorpus.github.io/Leaflet.PathGrab/).
 
