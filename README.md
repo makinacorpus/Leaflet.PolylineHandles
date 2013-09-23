@@ -9,6 +9,7 @@ distance.
 
 Play with [online demo](http://makinacorpus.github.io/Leaflet.PathGrab/).
 
+It requires [Leaflet.GeometryUtil](https://github.com/makinacorpus/Leaflet.GeometryUtil/) and [Leaflet.Snap](https://github.com/makinacorpus/Leaflet.Snap/).
 
 Usage
 -----
