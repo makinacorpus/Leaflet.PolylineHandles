@@ -38,6 +38,13 @@ Additionally, events dedicated to line hovering:
 * **grab:out** : fired when mouse is far.
 
 
+Ideas
+-----
+
+* Make marker snapping / attaching optional
+* Control hovering and snapping distances from options
+
+
 Authors
 -------
 
