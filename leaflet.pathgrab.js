@@ -39,9 +39,9 @@ L.Handler.PolylineGrab = L.Handler.extend({
     addHooks: function () {
         this._map.on('mousemove', this.__mouseMoveSampling, this);
         this._map.on('mousemovesample', this._onMouseMove, this);
-        this.on('grab:on', this._onGrabOn, this);
+        this.on('grab:over', this._onGrabOn, this);
         this.on('grab:move', this._onGrabMove, this);
-        this.on('grab:off', this._onGrabOff, this);
+        this.on('grab:out', this._onGrabOff, this);
         this.on('attach', this._onAttach, this);
         this.on('detach', this._onDetach, this);
     },
@@ -49,9 +49,9 @@ L.Handler.PolylineGrab = L.Handler.extend({
     removeHooks: function () {
         this.off('attach', this._onAttach, this);
         this.off('detach', this._onDetach, this);
-        this.off('grab:on', this._onGrabOn, this);
+        this.off('grab:over', this._onGrabOn, this);
         this.off('grab:move', this._onGrabMove, this);
-        this.off('grab:off', this._onGrabOff, this);
+        this.off('grab:out', this._onGrabOff, this);
         this._map.off('mousemovesample');
         this._map.off('mousemove', this.__mouseMoveSampling, this);
     },
@@ -77,15 +77,15 @@ L.Handler.PolylineGrab = L.Handler.extend({
 
         if (closest) {
             if (!this._previous) {
-                this.fire('grab:on', {layer: closest.layer,
-                                      latlng: closest.latlng});
+                this.fire('grab:over', {layer: closest.layer,
+                                        latlng: closest.latlng});
             }
             this.fire('grab:move', {layer: closest.layer,
                                     latlng: closest.latlng});
         }
         else {
             if (this._previous) {
-                this.fire('grab:off');
+                this.fire('grab:out');
             }
         }
         this._previous = closest;

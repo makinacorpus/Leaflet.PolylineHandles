@@ -30,9 +30,9 @@ Usage
 
 Additionally, events dedicated to line hovering:
 
-* **grab:on** (latlng, layer) : fired when mouse is close to the line.
+* **grab:over** (latlng, layer) : fired when mouse is close to the line.
 * **grab:move** (latlng, layer) : fired when mouse is moved.
-* **grab:off** : fired when mouse is far.
+* **grab:out** : fired when mouse is far.
 
 
 Authors
