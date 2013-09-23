@@ -10,6 +10,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
     statics: {
         HOVER_DISTANCE: 45,   // pixels
         SAMPLING_PERIOD: 50,  // ms
+        COLLAPSE_DISTANCE: 15, // pixels
     },
 
     initialize: function (map) {
@@ -17,10 +18,10 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._layers = [];
         this._previous = null;
         this._dragging = false;
-
+        this._attached = [];
         this._marker = null;
 
-        // Reduce 'mousemove' event trigger frequency
+        // Reduce 'mousemove' event frequency
         this.__mouseMoveSampling = (function () {
             var timer = new Date();
             return function (e) {
@@ -41,9 +42,13 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this.on('grab:on', this._onGrabOn, this);
         this.on('grab:move', this._onGrabMove, this);
         this.on('grab:off', this._onGrabOff, this);
+        this.on('attach', this._onAttach, this);
+        this.on('detach', this._onDetach, this);
     },
 
     removeHooks: function () {
+        this.off('attach', this._onAttach, this);
+        this.off('detach', this._onDetach, this);
         this.off('grab:on', this._onGrabOn, this);
         this.off('grab:move', this._onGrabMove, this);
         this.off('grab:off', this._onGrabOff, this);
@@ -84,18 +89,40 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._previous = closest;
     },
 
+    _onAttach: function (e) {
+        this._attached.push(e.marker);
+    },
+
+    _onDetach: function (e) {
+        var idx = this._attached.indexOf(e.marker);
+        this._attached.splice(idx, 1);
+    },
+
     _onGrabOn: function (e) {
         var grabIcon = L.divIcon({className: 'grab-icon'});
         this._marker = L.marker(e.latlng, {icon: grabIcon});
-        this._marker.addTo(this._map);
-
-        this._marker.dragging = new L.Handler.MarkerDrag(this._marker);
-        this._marker.dragging.enable();
         this._marker.on('dragstart', this._onDragStart, this);
         this._marker.on('dragend', this._onDragEnd, this);
     },
 
     _onGrabMove: function (e) {
+        // Hide current marker when approaching the ones already attached.
+        for (var i=0, n=this._attached.length; i<n; i++) {
+            var attached = this._attached[i],
+                space = L.GeometryUtil.distance(this._map,
+                                                attached.getLatLng(),
+                                                e.latlng);
+            if (space < L.Handler.PolylineGrab.COLLAPSE_DISTANCE) {
+                this._map.removeLayer(this._marker);
+                return;
+            }
+        }
+        // No attached marker around
+        if (i == n) {
+            this._map.addLayer(this._marker);
+            this._marker.dragging = new L.Handler.MarkerDrag(this._marker);
+            this._marker.dragging.enable();
+        }
         this._marker.setLatLng(e.latlng);
     },
 
