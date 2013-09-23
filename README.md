@@ -23,14 +23,14 @@ Usage
 
 ### Events ###
 
-* ** attach ** (marker, layer) : fired when a grab is attached to a line.
-* ** detach ** (marker) : fired when a grab is detached from a line.
+* **attach** (marker, layer) : fired when a grab is attached to a line.
+* **detach** (marker) : fired when a grab is detached from a line.
 
 Additionally, events dedicated to grab markers:
 
-* ** grab:on ** (latlng) : fired when mouse is close to the line.
-* ** grab:move ** (latlng) : fired when mouse is moved.
-* ** grab:off ** : fired when mouse is far.
+* **grab:on** (latlng) : fired when mouse is close to the line.
+* **grab:move** (latlng) : fired when mouse is moved.
+* **grab:off** : fired when mouse is far.
 
 
 Authors
