@@ -51,12 +51,21 @@ var PolylineGrab = {
         var snapfunc = L.GeometryUtil.closestLayerSnap,
             distance = PolylineGrab.statics.HOVER_DISTANCE,
             closest = snapfunc(this._map, [this], e.latlng, distance, false);
+
         if (closest) {
+            if (!this.__previous) {
+                this.fire('grab:on', {layer: this});
+            }
             this._map.__grabMarker.setLatLng(closest.latlng).addTo(this._map);
+            this.fire('grab:move', {layer: this, latlng: e.latlng});
         }
         else {
             this._map.removeLayer(this._map.__grabMarker);
+            if (this.__previous) {
+                this.fire('grab:off', {layer: this});
+            }
         }
+        this.__previous = closest;
     }
 };
 
