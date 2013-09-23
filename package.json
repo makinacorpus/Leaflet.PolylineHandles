@@ -1,0 +1,21 @@
+{
+    "name": "leaflet-pathgrab"
+  , "version": "0.0.1"
+  , "description": ""
+  , "keywords": ["Leaflet", "GIS"]
+  , "main": "leaflet.pathgrab.js"
+  , "bugs": {
+    "url": "https://github.com/makinacorpus/Leaflet.PathGrab/issues"
+  }
+  , "repository": {
+    "type": "git",
+    "url": "git://github.com/makinacorpus/Leaflet.PathGrab.git"
+  }
+  , "license": "MIT"
+  , "scripts": {
+  }
+  , "dependencies": {
+    "leaflet": "*",
+    "leaflet-geometryutil": "*"
+  }
+}

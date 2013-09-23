@@ -1,0 +1,6 @@
+[submodule "Leaflet.Snap"]
+	path = Leaflet.Snap
+	url = https://github.com/makinacorpus/Leaflet.Snap.git
+[submodule "Leaflet.GeometryUtil"]
+	path = Leaflet.GeometryUtil
+	url = https://github.com/makinacorpus/Leaflet.GeometryUtil.git
