@@ -142,7 +142,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._dragging = true;
 
         var marker = e.target;
-        marker.snapediting = new L.Handler.MarkerSnap(this._map, marker);
+        marker.snapediting = new L.Handler.MarkerSnap(this._map, marker, {snapVertices: false});
         for (var i=0, n=this._layers.length; i<n; i++) {
             marker.snapediting.addGuideLayer(this._layers[i]);
         }
