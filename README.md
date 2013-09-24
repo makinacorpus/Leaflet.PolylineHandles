@@ -41,7 +41,8 @@ Additionally, events dedicated to line hovering:
 Ideas
 -----
 
-* Make marker snapping / attaching optional
+* Make marker snapping / attaching optional (or split into 2 handlers)
+* Click on marker should attach
 * Control hovering and snapping distances from options
 
 
