@@ -8,7 +8,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
     includes: L.Mixin.Events,
 
     statics: {
-        HOVER_DISTANCE: 45,   // pixels
+        HOVER_DISTANCE: 25,   // pixels
         SAMPLING_PERIOD: 50,  // ms
         COLLAPSE_DISTANCE: 15, // pixels
     },
