@@ -105,6 +105,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._marker = L.marker(e.latlng, {icon: grabIcon});
         this._marker.on('dragstart', this._onDragStart, this);
         this._marker.on('dragend', this._onDragEnd, this);
+        this._marker.on('click', this._onClick, this);
     },
 
     _onGrabMove: function (e) {
@@ -167,14 +168,16 @@ L.Handler.PolylineGrab = L.Handler.extend({
         marker.off('snap', this._onSnap, this);
         marker.off('unsnap', this._onUnsnap, this);
 
-        if (this._snap) {
+        if (this._snap && !!!marker.attached) {
+            marker.attached = true;
             this.fire('attach', {marker: marker, layer: this._snap});
             L.DomUtil.addClass(marker._icon, 'marker-attached');
             // Start over
             this._onGrabOn({latlng: marker.getLatLng()});
         }
         else {
-            if (marker !== this._marker) {
+            if (marker.attached) {
+                marker.attached = false;
                 this.fire('detach', {marker: marker});
                 L.DomUtil.removeClass(marker._icon, 'marker-attached');
                 // Remove from map
@@ -182,7 +185,14 @@ L.Handler.PolylineGrab = L.Handler.extend({
             }
         }
         this._dragging = false;
-    }
+    },
+
+    _onClick: function (e) {
+        var marker = e.target;
+        this._onDragStart(e);
+        marker.fire('move');
+        this._onDragEnd(e);
+    },
 });
 
 L.Map.addInitHook('addHandler', 'polylineGrab', L.Handler.PolylineGrab);
