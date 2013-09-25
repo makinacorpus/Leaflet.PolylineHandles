@@ -4,3 +4,6 @@
 [submodule "Leaflet.GeometryUtil"]
 	path = Leaflet.GeometryUtil
 	url = https://github.com/makinacorpus/Leaflet.GeometryUtil.git
+[submodule "Leaflet.AlmostOver"]
+	path = Leaflet.AlmostOver
+	url = git@github.com:makinacorpus/Leaflet.AlmostOver.git
