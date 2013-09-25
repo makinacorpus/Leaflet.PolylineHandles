@@ -1,5 +1,5 @@
-L.Map.mergeOptions({
-    polylineGrab: true
+L.PolyLine.mergeOptions({
+    polylineGrab: false
 });
 
 
@@ -61,6 +61,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
             this._marker = this.options.markerFactory(e.latlng);
         }
         else {
+            // Default marker and icon
             var grabIcon = L.divIcon({className: 'grab-icon'});
             this._marker = L.marker(e.latlng, {icon: grabIcon});
         }
@@ -100,14 +101,15 @@ L.Handler.PolylineGrab = L.Handler.extend({
     },
 
     // When marker starts dragging :
-    //  - initialize snapping
     //  - ignore map mouse moves
+    //  - detach if was attached
+    //  - initialize snapping if new marker
     _onDragStart: function (e) {
         this._toggleAlmostEvent(false);
 
         var marker = e.target;
 
-        if (marker.attached) {
+        if (!!marker.attached) {
             this._detach(marker);
         }
         else {
@@ -119,6 +121,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
         marker.snapediting.enable();
         marker.on('snap', this._onSnap, this);
         marker.on('unsnap', this._onUnsnap, this);
+        // Don't listen to click while dragging
         marker.off('click', this._onClick, this);
     },
 
