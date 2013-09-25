@@ -7,41 +7,25 @@ L.Handler.PolylineGrab = L.Handler.extend({
 
     includes: L.Mixin.Events,
 
-    statics: {
-        HOVER_DISTANCE: 25,   // pixels
-        SAMPLING_PERIOD: 50,  // ms
-        COLLAPSE_DISTANCE: 15, // pixels
+    options: {
+        overlapRadius: 15, // pixels
+        markerFactory: null
     },
 
     initialize: function (map) {
+        if (map.almostOver === undefined) {
+            throw 'Leaflet.AlmostOver handler is required on this map.';
+        }
         this._map = map;
-        this._layers = [];
-        this._previous = null;
         this._dragging = false;
         this._attached = [];
         this._marker = null;
-
-        // Reduce 'mousemove' event frequency
-        this.__mouseMoveSampling = (function () {
-            var timer = new Date();
-            return function (e) {
-                var date = new Date(),
-                    filtered = (date - timer) < L.Handler.PolylineGrab.SAMPLING_PERIOD;
-                if (filtered) {
-                    return;  // Ignore movement
-                }
-                timer = date;
-                this._map.fire('mousemovesample', {latlng: e.latlng});
-            };
-        })();
+        this._snap = null;
+        this._layers = [];
     },
 
     addHooks: function () {
-        this._map.on('mousemove', this.__mouseMoveSampling, this);
-        this._map.on('mousemovesample', this._onMouseMove, this);
-        this.on('grab:over', this._onGrabOn, this);
-        this.on('grab:move', this._onGrabMove, this);
-        this.on('grab:out', this._onGrabOff, this);
+        this._toggleAlmostEvent(true);
         this.on('attach', this._onAttach, this);
         this.on('detach', this._onDetach, this);
     },
@@ -49,46 +33,18 @@ L.Handler.PolylineGrab = L.Handler.extend({
     removeHooks: function () {
         this.off('attach', this._onAttach, this);
         this.off('detach', this._onDetach, this);
-        this.off('grab:over', this._onGrabOn, this);
-        this.off('grab:move', this._onGrabMove, this);
-        this.off('grab:out', this._onGrabOff, this);
-        this._map.off('mousemovesample');
-        this._map.off('mousemove', this.__mouseMoveSampling, this);
+        this._toggleAlmostEvent(false);
     },
 
-    addLayer: function (layer) {
-        if (typeof layer.eachLayer == 'function') {
-            layer.eachLayer(function (l) {
-                this.addLayer(l);
-            }, this);
-        }
-        else {
-            this._layers.push(layer);
-        }
+    addGuideLayer: function (l) {
+        this._layers.push(l);
     },
 
-    _onMouseMove: function (e) {
-        if (this._dragging)
-            return;
-
-        var snapfunc = L.GeometryUtil.closestLayerSnap,
-            distance = L.Handler.PolylineGrab.HOVER_DISTANCE,
-            closest = snapfunc(this._map, this._layers, e.latlng, distance, false);
-
-        if (closest) {
-            if (!this._previous) {
-                this.fire('grab:over', {layer: closest.layer,
-                                        latlng: closest.latlng});
-            }
-            this.fire('grab:move', {layer: closest.layer,
-                                    latlng: closest.latlng});
-        }
-        else {
-            if (this._previous) {
-                this.fire('grab:out');
-            }
-        }
-        this._previous = closest;
+    _toggleAlmostEvent: function (state) {
+        var method = state ? 'on' : 'off';
+        this._map[method]('almost:over', this._onAlmostOver, this);
+        this._map[method]('almost:move', this._onAlmostMove, this);
+        this._map[method]('almost:out', this._onAlmostOut, this);
     },
 
     _onAttach: function (e) {
@@ -100,22 +56,28 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._attached.splice(idx, 1);
     },
 
-    _onGrabOn: function (e) {
-        var grabIcon = L.divIcon({className: 'grab-icon'});
-        this._marker = L.marker(e.latlng, {icon: grabIcon});
+    _onAlmostOver: function (e) {
+        if (this.options.markerFactory) {
+            this._marker = this.options.markerFactory(e.latlng);
+        }
+        else {
+            var grabIcon = L.divIcon({className: 'grab-icon'});
+            this._marker = L.marker(e.latlng, {icon: grabIcon});
+        }
+        this._marker.attached = false;
         this._marker.on('dragstart', this._onDragStart, this);
         this._marker.on('dragend', this._onDragEnd, this);
         this._marker.on('click', this._onClick, this);
     },
 
-    _onGrabMove: function (e) {
+    _onAlmostMove: function (e) {
         // Hide current marker when approaching the ones already attached.
         for (var i=0, n=this._attached.length; i<n; i++) {
             var attached = this._attached[i],
                 space = L.GeometryUtil.distance(this._map,
                                                 attached.getLatLng(),
                                                 e.latlng);
-            if (space < L.Handler.PolylineGrab.COLLAPSE_DISTANCE) {
+            if (space < this.options.overlapRadius) {
                 this._map.removeLayer(this._marker);
                 return;
             }
@@ -129,9 +91,10 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._marker.setLatLng(e.latlng);
     },
 
-    _onGrabOff: function (e) {
+    _onAlmostOut: function (e) {
         this._marker.off('dragstart', this._onDragStart, this);
         this._marker.off('dragend', this._onDragEnd, this);
+        this._marker.off('click', this._onClick, this);
         this._map.removeLayer(this._marker);
         this._marker = null;
     },
@@ -140,7 +103,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
     //  - initialize snapping
     //  - ignore map mouse moves
     _onDragStart: function (e) {
-        this._dragging = true;
+        this._toggleAlmostEvent(false);
 
         var marker = e.target;
         marker.snapediting = new L.Handler.MarkerSnap(this._map, marker, {snapVertices: false});
@@ -168,12 +131,12 @@ L.Handler.PolylineGrab = L.Handler.extend({
         marker.off('snap', this._onSnap, this);
         marker.off('unsnap', this._onUnsnap, this);
 
-        if (this._snap && !!!marker.attached) {
+        if (this._snap && !marker.attached) {
             marker.attached = true;
             this.fire('attach', {marker: marker, layer: this._snap});
             L.DomUtil.addClass(marker._icon, 'marker-attached');
             // Start over
-            this._onGrabOn({latlng: marker.getLatLng()});
+            this._onAlmostOver({latlng: marker.getLatLng()});
         }
         else {
             if (marker.attached) {
@@ -184,7 +147,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
                 this._map.removeLayer(marker);
             }
         }
-        this._dragging = false;
+        this._toggleAlmostEvent(true);
     },
 
     _onClick: function (e) {

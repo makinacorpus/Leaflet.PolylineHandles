@@ -1,15 +1,16 @@
 Leaflet.PathGrab
 ================
 
-This plugin allows to detect mouse hovering events on lines, with a tolerance
-distance.
-
-It can also be used to grab intermediary points on a polyline, the same way
+This plugin allows to grab intermediary points on a polyline, the same way
 you choose intermediary steps on route maps.
 
 Play with [online demo](http://makinacorpus.github.io/Leaflet.PathGrab/).
 
-It requires [Leaflet.GeometryUtil](https://github.com/makinacorpus/Leaflet.GeometryUtil/) and [Leaflet.Snap](https://github.com/makinacorpus/Leaflet.Snap/).
+It requires:
+
+* [Leaflet.GeometryUtil](https://github.com/makinacorpus/Leaflet.GeometryUtil/)
+* [Leaflet.AlmostOver](https://github.com/makinacorpus/Leaflet.AlmostOver/).
+* [Leaflet.Snap](https://github.com/makinacorpus/Leaflet.Snap/).
 
 Usage
 -----
@@ -20,7 +21,7 @@ Usage
     ...
     var lines = L.geoJson(...);
     ...
-    map.polylineGrab.addLayer(lines);
+    map.polylineGrab.addGuideLayer(lines);
 
 ```
 
@@ -31,18 +32,11 @@ And add default stylesheet ``leaflet.pathgrab.css`` for grab markers.
 * **attach** (marker, layer) : fired when a grab is attached to a line.
 * **detach** (marker) : fired when a grab is detached from a line.
 
-Additionally, events dedicated to line hovering:
 
-* **grab:over** (latlng, layer) : fired when mouse is close to the line.
-* **grab:move** (latlng, layer) : fired when mouse is moved.
-* **grab:out** : fired when mouse is far.
+TODO
+----
 
-
-Ideas
------
-
-* Make marker snapping / attaching optional (or split into 2 handlers)
-* Control hovering and snapping distances from options
+* Moving a marker along a line should not detach it
 
 
 Authors
