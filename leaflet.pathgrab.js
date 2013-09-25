@@ -1,8 +1,3 @@
-L.PolyLine.mergeOptions({
-    polylineGrab: false
-});
-
-
 L.Handler.PolylineGrab = L.Handler.extend({
 
     includes: L.Mixin.Events,
@@ -13,10 +8,11 @@ L.Handler.PolylineGrab = L.Handler.extend({
     },
 
     initialize: function (map) {
+        L.Handler.prototype.initialize.call(this, map);
+
         if (map.almostOver === undefined) {
             throw 'Leaflet.AlmostOver handler is required on this map.';
         }
-        this._map = map;
         this._dragging = false;
         this._attached = [];
         this._marker = null;
@@ -180,4 +176,29 @@ L.Handler.PolylineGrab = L.Handler.extend({
     },
 });
 
-L.Map.addInitHook('addHandler', 'polylineGrab', L.Handler.PolylineGrab);
+
+L.Polyline.mergeOptions({
+    polylineGrab: false
+});
+
+
+L.PolylineGrabMixin = {
+    __onAdd: L.Polyline.prototype.onAdd,
+    __onRemove: L.Polyline.prototype.onRemove,
+
+    onAdd: function (map) {
+        this.__onAdd.call(this, map);
+
+        this.polylineGrab = new L.Handler.PolylineGrab(map);
+        if (this.options.polylineGrab) {
+            this.polylineGrab.enable();
+        }
+    },
+
+    onRemove: function (map) {
+        this.polylineGrab.disable();
+        this.__onRemove.call(this, map);
+    },
+};
+
+L.Polyline.include(L.PolylineGrabMixin);
