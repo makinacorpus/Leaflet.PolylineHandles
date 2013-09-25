@@ -112,6 +112,7 @@ L.Handler.PolylineGrab = L.Handler.extend({
         }
         marker.on('snap', this._onSnap, this);
         marker.on('unsnap', this._onUnsnap, this);
+        marker.off('click', this._onClick, this);
     },
 
     _onSnap: function (e) {
@@ -131,26 +132,40 @@ L.Handler.PolylineGrab = L.Handler.extend({
         marker.off('snap', this._onSnap, this);
         marker.off('unsnap', this._onUnsnap, this);
 
-        if (this._snap && !marker.attached) {
-            marker.attached = true;
-            this.fire('attach', {marker: marker, layer: this._snap});
-            L.DomUtil.addClass(marker._icon, 'marker-attached');
-            // Start over
+        if (this._snap) {
+            this._attach(marker, this._snap);
+            // Start over with new marker
             this._onAlmostOver({latlng: marker.getLatLng()});
         }
         else {
             if (marker.attached) {
-                marker.attached = false;
-                this.fire('detach', {marker: marker});
-                L.DomUtil.removeClass(marker._icon, 'marker-attached');
-                // Remove from map
-                this._map.removeLayer(marker);
+                this._detach(marker);
             }
+            this._map.removeLayer(marker);
         }
         this._toggleAlmostEvent(true);
     },
 
+    _attach: function (marker, layer) {
+        marker.attached = true;
+        this.fire('attach', {marker: marker, layer: layer});
+        if (marker._icon) L.DomUtil.addClass(marker._icon, 'marker-attached');
+
+        // Detach on click
+        marker.on('click', function (e) {
+            this._detach(marker);
+            this._map.removeLayer(e.target);
+        }, this);
+    },
+
+    _detach: function (marker) {
+        marker.attached = false;
+        this.fire('detach', {marker: marker});
+        if (marker._icon) L.DomUtil.removeClass(marker._icon, 'marker-attached');
+    },
+
     _onClick: function (e) {
+        // Simulate drag-snap on click
         var marker = e.target;
         this._onDragStart(e);
         marker.fire('move');
