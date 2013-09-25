@@ -1,21 +1,22 @@
 {
-    "name": "leaflet-pathgrab"
+    "name": "leaflet-polylinehandles"
   , "version": "0.0.1"
   , "description": ""
   , "keywords": ["Leaflet", "GIS"]
-  , "main": "leaflet.pathgrab.js"
+  , "main": "leaflet.polylinehandles.js"
   , "bugs": {
-    "url": "https://github.com/makinacorpus/Leaflet.PathGrab/issues"
+    "url": "https://github.com/makinacorpus/Leaflet.PolylineHandles/issues"
   }
   , "repository": {
     "type": "git",
-    "url": "git://github.com/makinacorpus/Leaflet.PathGrab.git"
+    "url": "git://github.com/makinacorpus/Leaflet.PolylineHandles.git"
   }
   , "license": "MIT"
   , "scripts": {
   }
   , "dependencies": {
     "leaflet": "*",
-    "leaflet-geometryutil": "*"
+    "leaflet-almostover": "*",
+    "leaflet-snap": "*"
   }
 }

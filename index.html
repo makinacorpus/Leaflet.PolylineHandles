@@ -2,15 +2,15 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>Leaflet.PathGrab</title>
+  <title>Leaflet.PolylineHandles</title>
 
   <script type='text/javascript' src="http://cdn.leafletjs.com/leaflet-0.6.3/leaflet.js"></script>
   <script type='text/javascript' src="Leaflet.GeometryUtil/dist/leaflet.geometryutil.js"></script>
   <script type='text/javascript' src="Leaflet.Snap/leaflet.snap.js"></script>
   <script type='text/javascript' src="Leaflet.AlmostOver/leaflet.almostover.js"></script>
 
-  <script type='text/javascript' src="leaflet.pathgrab.js"></script>
-  <link rel="stylesheet" type="text/css" href="leaflet.pathgrab.css">
+  <script type='text/javascript' src="leaflet.polylinehandles.js"></script>
+  <link rel="stylesheet" type="text/css" href="leaflet.polylinehandles.css">
 
   <link rel="stylesheet" type="text/css" href="http://cdn.leafletjs.com/leaflet-0.6.3/leaflet.css">
   <style type='text/css'>
@@ -64,13 +64,13 @@
       map.almostOver.addLayer(oneline);
 
       // But set all lines as snap guides
-      oneline.polylineGrab.addGuideLayer(lines);
-      oneline.polylineGrab.enable();
+      oneline.polylineHandles.addGuideLayer(lines);
+      oneline.polylineHandles.enable();
 
       //
       // Display feedback on attach/detach
       //
-      oneline.polylineGrab.on('attach', function (e) {
+      oneline.polylineHandles.on('attach', function (e) {
           var latlng = e.marker.getLatLng(),
               pos = L.GeometryUtil.locateOnLine(map, e.layer, latlng);
           e.marker.bindPopup(Math.round(pos * 100) + '%').openPopup();
@@ -79,7 +79,7 @@
               subline = L.polyline(subcoords, {color: 'red', opacity: 0.3});
           map.addLayer(subline);
 
-          oneline.polylineGrab.on('detach', function (e1) {
+          oneline.polylineHandles.on('detach', function (e1) {
               if (e.marker === e1.marker) {
                   map.removeLayer(subline);
               }

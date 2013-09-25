@@ -1,4 +1,4 @@
-L.Handler.PolylineGrab = L.Handler.extend({
+L.Handler.PolylineHandles = L.Handler.extend({
 
     includes: L.Mixin.Events,
 
@@ -58,8 +58,8 @@ L.Handler.PolylineGrab = L.Handler.extend({
         }
         else {
             // Default marker and icon
-            var grabIcon = L.divIcon({className: 'grab-icon'});
-            this._marker = L.marker(e.latlng, {icon: grabIcon});
+            var handleIcon = L.divIcon({className: 'handle-icon'});
+            this._marker = L.marker(e.latlng, {icon: handleIcon});
         }
         this._marker.attached = false;
         this._marker.on('dragstart', this._onDragStart, this);
@@ -178,27 +178,27 @@ L.Handler.PolylineGrab = L.Handler.extend({
 
 
 L.Polyline.mergeOptions({
-    polylineGrab: false
+    polylineHandles: false
 });
 
 
-L.PolylineGrabMixin = {
+L.PolylineHandlesMixin = {
     __onAdd: L.Polyline.prototype.onAdd,
     __onRemove: L.Polyline.prototype.onRemove,
 
     onAdd: function (map) {
         this.__onAdd.call(this, map);
 
-        this.polylineGrab = new L.Handler.PolylineGrab(map);
-        if (this.options.polylineGrab) {
-            this.polylineGrab.enable();
+        this.polylineHandles = new L.Handler.PolylineHandles(map);
+        if (this.options.polylineHandles) {
+            this.polylineHandles.enable();
         }
     },
 
     onRemove: function (map) {
-        this.polylineGrab.disable();
+        this.polylineHandles.disable();
         this.__onRemove.call(this, map);
     },
 };
 
-L.Polyline.include(L.PolylineGrabMixin);
+L.Polyline.include(L.PolylineHandlesMixin);

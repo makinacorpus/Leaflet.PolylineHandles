@@ -1,4 +1,4 @@
-.grab-icon {
+.handle-icon {
     background-color: white;
     width: 24px;
     height: 24px;
@@ -8,10 +8,10 @@
     border: 3px solid black;
 }
 
-.grab-icon.marker-snapped {
+.handle-icon.marker-snapped {
     background-color: yellow;
 }
 
-.grab-icon.marker-attached {
+.handle-icon.marker-attached {
     border: 4px solid orange;
 }
