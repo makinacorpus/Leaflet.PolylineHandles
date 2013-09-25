@@ -106,10 +106,17 @@ L.Handler.PolylineGrab = L.Handler.extend({
         this._toggleAlmostEvent(false);
 
         var marker = e.target;
-        marker.snapediting = new L.Handler.MarkerSnap(this._map, marker, {snapVertices: false});
-        for (var i=0, n=this._layers.length; i<n; i++) {
-            marker.snapediting.addGuideLayer(this._layers[i]);
+
+        if (marker.attached) {
+            this._detach(marker);
         }
+        else {
+            marker.snapediting = new L.Handler.MarkerSnap(this._map, marker, {snapVertices: false});
+            for (var i=0, n=this._layers.length; i<n; i++) {
+                marker.snapediting.addGuideLayer(this._layers[i]);
+            }
+        }
+        marker.snapediting.enable();
         marker.on('snap', this._onSnap, this);
         marker.on('unsnap', this._onUnsnap, this);
         marker.off('click', this._onClick, this);
@@ -138,9 +145,6 @@ L.Handler.PolylineGrab = L.Handler.extend({
             this._onAlmostOver({latlng: marker.getLatLng()});
         }
         else {
-            if (marker.attached) {
-                this._detach(marker);
-            }
             this._map.removeLayer(marker);
         }
         this._toggleAlmostEvent(true);
