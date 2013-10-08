@@ -177,6 +177,14 @@ L.Handler.PolylineHandles = L.Handler.extend({
 });
 
 
+L.Handler.PolylineHandles.singleton = function (map) {
+    if (this.__polylineHandles)
+        return this.__polylineHandles;
+    this.__polylineHandles = new L.Handler.PolylineHandles(map);
+    return this.__polylineHandles;
+};
+
+
 L.Polyline.mergeOptions({
     polylineHandles: false
 });
@@ -189,7 +197,7 @@ L.PolylineHandlesMixin = {
     onAdd: function (map) {
         this.__onAdd.call(this, map);
 
-        this.polylineHandles = new L.Handler.PolylineHandles(map);
+        this.polylineHandles = L.Handler.PolylineHandles.singleton(map);
         if (this.options.polylineHandles) {
             this.polylineHandles.enable();
         }
