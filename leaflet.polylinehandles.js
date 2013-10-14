@@ -33,7 +33,15 @@ L.Handler.PolylineHandles = L.Handler.extend({
     },
 
     addGuideLayer: function (l) {
-        this._layers.push(l);
+        var index = this._layers.indexOf(l);
+        if (index < 0)
+            this._layers.push(l);
+    },
+
+    removeGuideLayer: function (l) {
+        var index = this._layers.indexOf(l);
+        if (index >= 0)
+            this._layers.splice(index, 1);
     },
 
     _toggleAlmostEvent: function (state) {
