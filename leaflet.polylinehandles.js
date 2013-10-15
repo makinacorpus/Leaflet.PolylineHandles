@@ -41,6 +41,7 @@ L.Handler.PolylineHandles = L.Handler.extend({
         this._map[method]('almost:over', this._onAlmostOver, this);
         this._map[method]('almost:move', this._onAlmostMove, this);
         this._map[method]('almost:out', this._onAlmostOut, this);
+        this._map[method]('almost:click', this._onAlmostClick, this);
     },
 
     _onAttach: function (e) {
@@ -94,6 +95,12 @@ L.Handler.PolylineHandles = L.Handler.extend({
         this._marker.off('click', this._onClick, this);
         this._map.removeLayer(this._marker);
         this._marker = null;
+    },
+
+    _onAlmostClick: function (e) {
+        // this._marker should be set in almost:over
+        console.assert(this._marker);
+        this._marker.fire('click', e);
     },
 
     // When marker starts dragging :
