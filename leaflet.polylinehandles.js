@@ -103,6 +103,11 @@ L.Handler.PolylineHandles = L.Handler.extend({
         this._marker.fire('click', e);
     },
 
+    refreshMarker: function () {
+        // Will retrigger almost:over
+        this._map.fire('mousemovesample', {latlng: L.latLng([0, 0])});
+    },
+
     // When marker starts dragging :
     //  - ignore map mouse moves
     //  - detach if was attached
