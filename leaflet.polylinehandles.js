@@ -5,7 +5,8 @@ L.Handler.PolylineHandles = L.Handler.extend({
     options: {
         overlapRadius: 15, // pixels
         markerFactory: null,
-        attachOnClick: true
+        attachOnClick: true,
+        detachOnClick: true
     },
 
     initialize: function (map) {
@@ -169,12 +170,14 @@ L.Handler.PolylineHandles = L.Handler.extend({
 
         // Detach on click
         // Since mouse-up fires click at 'dragend'. Wait.
-        setTimeout(L.Util.bind(function () {
-            marker.on('click', function (e) {
-                this._detach(marker);
-                this._map.removeLayer(e.target);
-            }, this);
-        }, this), 500);
+        if (!!this.options.detachOnClick) {
+            setTimeout(L.Util.bind(function () {
+                marker.on('click', function (e) {
+                    this._detach(marker);
+                    this._map.removeLayer(e.target);
+                }, this);
+            }, this), 100);
+        }
     },
 
     _detach: function (marker) {
