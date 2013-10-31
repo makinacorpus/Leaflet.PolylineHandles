@@ -4,7 +4,8 @@ L.Handler.PolylineHandles = L.Handler.extend({
 
     options: {
         overlapRadius: 15, // pixels
-        markerFactory: null
+        markerFactory: null,
+        attachOnClick: true
     },
 
     initialize: function (map) {
@@ -180,11 +181,13 @@ L.Handler.PolylineHandles = L.Handler.extend({
     },
 
     _onClick: function (e) {
-        // Simulate drag-snap on click
-        var marker = e.target;
-        this._onDragStart(e);
-        marker.fire('move');
-        this._onDragEnd(e);
+        if (!!this.options.attachOnClick) {
+            // Simulate drag-snap on click
+            var marker = e.target;
+            this._onDragStart(e);
+            marker.fire('move');
+            this._onDragEnd(e);
+        }
     },
 });
 
