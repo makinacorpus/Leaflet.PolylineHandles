@@ -168,10 +168,13 @@ L.Handler.PolylineHandles = L.Handler.extend({
         if (marker._icon) L.DomUtil.addClass(marker._icon, 'marker-attached');
 
         // Detach on click
-        marker.on('click', function (e) {
-            this._detach(marker);
-            this._map.removeLayer(e.target);
-        }, this);
+        // Since mouse-up fires click at 'dragend'. Wait.
+        setTimeout(L.Util.bind(function () {
+            marker.on('click', function (e) {
+                this._detach(marker);
+                this._map.removeLayer(e.target);
+            }, this);
+        }, this), 500);
     },
 
     _detach: function (marker) {
