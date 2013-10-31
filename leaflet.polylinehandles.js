@@ -88,6 +88,7 @@ L.Handler.PolylineHandles = L.Handler.extend({
             this._marker.dragging = new L.Handler.MarkerDrag(this._marker);
             this._marker.dragging.enable();
         }
+        this._marker.from = e.layer;
         this._marker.setLatLng(e.latlng);
     },
 
@@ -128,6 +129,9 @@ L.Handler.PolylineHandles = L.Handler.extend({
                 marker.snapediting.addGuideLayer(this._layers[i]);
             }
         }
+
+        marker.from.fire('grab', {marker: marker});
+
         marker.snapediting.enable();
         marker.on('snap', this._onSnap, this);
         marker.on('unsnap', this._onUnsnap, this);
@@ -165,7 +169,9 @@ L.Handler.PolylineHandles = L.Handler.extend({
 
     _attach: function (marker, layer) {
         marker.attached = true;
-        this.fire('attach', {marker: marker, layer: layer});
+        this.fire('attach', {marker: marker,
+                             from: marker.from,
+                             layer: layer});
         if (marker._icon) L.DomUtil.addClass(marker._icon, 'marker-attached');
 
         // Detach on click
