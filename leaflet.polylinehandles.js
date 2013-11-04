@@ -4,7 +4,9 @@ L.Handler.PolylineHandles = L.Handler.extend({
 
     options: {
         overlapRadius: 15, // pixels
-        markerFactory: null
+        markerFactory: null,
+        attachOnClick: true,
+        detachOnClick: true
     },
 
     initialize: function (map) {
@@ -49,6 +51,7 @@ L.Handler.PolylineHandles = L.Handler.extend({
         this._map[method]('almost:over', this._onAlmostOver, this);
         this._map[method]('almost:move', this._onAlmostMove, this);
         this._map[method]('almost:out', this._onAlmostOut, this);
+        this._map[method]('almost:click', this._onAlmostClick, this);
     },
 
     _onAttach: function (e) {
@@ -93,6 +96,7 @@ L.Handler.PolylineHandles = L.Handler.extend({
             this._marker.dragging = new L.Handler.MarkerDrag(this._marker);
             this._marker.dragging.enable();
         }
+        this._marker.from = e.layer;
         this._marker.setLatLng(e.latlng);
     },
 
@@ -102,6 +106,17 @@ L.Handler.PolylineHandles = L.Handler.extend({
         this._marker.off('click', this._onClick, this);
         this._map.removeLayer(this._marker);
         this._marker = null;
+    },
+
+    _onAlmostClick: function (e) {
+        // this._marker should be set in almost:over
+        console.assert(this._marker);
+        this._marker.fire('click', e);
+    },
+
+    refreshMarker: function () {
+        // Will retrigger almost:over
+        this._map.fire('mousemovesample', {latlng: L.latLng([0, 0])});
     },
 
     // When marker starts dragging :
@@ -122,6 +137,9 @@ L.Handler.PolylineHandles = L.Handler.extend({
                 marker.snapediting.addGuideLayer(this._layers[i]);
             }
         }
+
+        marker.from.fire('grab', {marker: marker});
+
         marker.snapediting.enable();
         marker.on('snap', this._onSnap, this);
         marker.on('unsnap', this._onUnsnap, this);
@@ -159,14 +177,21 @@ L.Handler.PolylineHandles = L.Handler.extend({
 
     _attach: function (marker, layer) {
         marker.attached = true;
-        this.fire('attach', {marker: marker, layer: layer});
+        this.fire('attach', {marker: marker,
+                             from: marker.from,
+                             layer: layer});
         if (marker._icon) L.DomUtil.addClass(marker._icon, 'marker-attached');
 
         // Detach on click
-        marker.on('click', function (e) {
-            this._detach(marker);
-            this._map.removeLayer(e.target);
-        }, this);
+        // Since mouse-up fires click at 'dragend'. Wait.
+        if (!!this.options.detachOnClick) {
+            setTimeout(L.Util.bind(function () {
+                marker.on('click', function (e) {
+                    this._detach(marker);
+                    this._map.removeLayer(e.target);
+                }, this);
+            }, this), 100);
+        }
     },
 
     _detach: function (marker) {
@@ -176,11 +201,13 @@ L.Handler.PolylineHandles = L.Handler.extend({
     },
 
     _onClick: function (e) {
-        // Simulate drag-snap on click
-        var marker = e.target;
-        this._onDragStart(e);
-        marker.fire('move');
-        this._onDragEnd(e);
+        if (!!this.options.attachOnClick) {
+            // Simulate drag-snap on click
+            var marker = e.target;
+            this._onDragStart(e);
+            marker.fire('move');
+            this._onDragEnd(e);
+        }
     },
 });
 
