@@ -4,7 +4,7 @@ Leaflet.PolylineHandles
 This plugin allows to grab intermediary points ("handles") on a polyline,
 and snap them around the same way you choose intermediary steps on route maps.
 
-Play with [online demo](http://makinacorpus.github.io/Leaflet.PolylineHandles/).
+Play with [online demo](https://makinacorpus.github.io/Leaflet.PolylineHandles/).
 
 It requires:
 
